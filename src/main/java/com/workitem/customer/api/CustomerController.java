@@ -1,5 +1,7 @@
 package com.workitem.customer.api;
 
+import com.workitem.customer.api.dto.CustomerRequest;
+import com.workitem.customer.api.dto.CustomerResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
