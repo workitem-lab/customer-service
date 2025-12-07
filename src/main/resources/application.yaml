@@ -1,0 +1,42 @@
+spring:                            # Root namespace for Spring configuration
+  application:
+    name: customer service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/customerdb
+    username: customer
+    password: customer
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+      show-sql: false
+
+server:
+  port: 8081
+
+management:
+  endpoints:
+    web:
+      expossure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+logging:
+  level:
+    root: INFO
+    org.springframework.web: DEBUG
+
+
