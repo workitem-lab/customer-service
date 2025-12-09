@@ -8,6 +8,7 @@ import lombok.Data;
 @Entity
 @Table (name = "customers")
 public class CustomerEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,10 +34,10 @@ public class CustomerEntity {
     }
 
     // Full-args constructor (useful for tests or mapping)
-    public CustomerEntity(Long id, String firstName, String lastName, String email) {
+    /*public CustomerEntity(Long id, String firstName, String lastName, String email) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-    }
+    }*/
 }

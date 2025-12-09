@@ -7,12 +7,12 @@ import com.workitem.customer.persistence.entity.CustomerEntity;
 
 public class CustomerMapper {
 
-    public static Customer toDomain(CustomerEntity customer) {
+    public static Customer toDomain(CustomerEntity entity) {
         return new Customer(
-                customer.getId(),
-                customer.getFirstName(),
-                customer.getLastName(),
-                customer.getEmail()
+                entity.getId(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getEmail()
         );
     }
     public static CustomerEntity toEntity(CustomerRequest request) {

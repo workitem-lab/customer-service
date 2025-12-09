@@ -2,13 +2,18 @@ package com.workitem.customer.domain.service;
 
 import com.workitem.customer.api.dto.CustomerRequest;
 import com.workitem.customer.api.dto.CustomerResponse;
+import com.workitem.customer.api.dto.PagedResponse;
 import com.workitem.customer.api.mapper.CustomerMapper;
 import com.workitem.customer.domain.model.Customer;
 import com.workitem.customer.exception.CustomerNotFoundException;
 import com.workitem.customer.persistence.entity.CustomerEntity;
 import com.workitem.customer.persistence.repo.CustomerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class CustomerService {
@@ -33,5 +38,35 @@ public class CustomerService {
                 .orElseThrow(() -> new CustomerNotFoundException(id));
         Customer domain = CustomerMapper.toDomain(entity);
         return CustomerMapper.toResponse(domain);
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponse<CustomerResponse> listCustomers(
+            String lastNameFilter,
+            Pageable pageable
+    ){
+        Page<CustomerEntity> page;
+
+        if(lastNameFilter != null && !lastNameFilter.isBlank()) {
+            page = repository.findByLastNameContainingIgnoreCase(lastNameFilter, pageable);
+        } else  {
+            page = repository.findAll(pageable);
+        }
+        
+        List<CustomerResponse> items = page.getContent()
+                .stream()
+                .map(CustomerMapper::toDomain)
+                .map(CustomerMapper::toResponse)
+                .toList();
+        
+        return new PagedResponse<>(
+                items,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
+
     }
 }

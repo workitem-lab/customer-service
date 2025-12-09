@@ -2,7 +2,9 @@ package com.workitem.customer.api;
 
 import com.workitem.customer.api.dto.CustomerRequest;
 import com.workitem.customer.api.dto.CustomerResponse;
+import com.workitem.customer.api.dto.PagedResponse;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,4 +28,13 @@ public class CustomerController {
     public CustomerResponse get(@PathVariable Long id){
         return service.get(id);
     }
+
+    @GetMapping
+    public PagedResponse<CustomerResponse> listCustomers(
+            @RequestParam(required = false) String lastName,
+            Pageable pageable
+    ){
+        return service.listCustomers(lastName, pageable);
+    }
+
 }
