@@ -1,9 +1,9 @@
 package com.workitem.customer.domain.service;
 
-import com.workitem.customer.api.dto.CustomerRequest;
-import com.workitem.customer.api.dto.CustomerResponse;
-import com.workitem.customer.api.dto.PagedResponse;
-import com.workitem.customer.api.mapper.CustomerMapper;
+import com.workitem.customer.api.v1.dto.CustomerRequestV1;
+import com.workitem.customer.api.v1.dto.CustomerResponseV1;
+import com.workitem.customer.api.v1.dto.PagedResponseV1;
+import com.workitem.customer.api.v1.mapper.CustomerMapperV1;
 import com.workitem.customer.domain.model.Customer;
 import com.workitem.customer.exception.CustomerNotFoundException;
 import com.workitem.customer.persistence.entity.CustomerEntity;
@@ -24,24 +24,24 @@ public class CustomerService {
     }
 
     @Transactional
-    public CustomerResponse create(CustomerRequest request){
-        CustomerEntity entity = CustomerMapper.toEntity(request);
+    public CustomerResponseV1 create(CustomerRequestV1 request){
+        CustomerEntity entity = CustomerMapperV1.toEntity(request);
         CustomerEntity savedEntity = repository.save(entity);
-        Customer domain = CustomerMapper.toDomain(savedEntity);
-        return CustomerMapper.toResponse(domain);
+        Customer domain = CustomerMapperV1.toDomain(savedEntity);
+        return CustomerMapperV1.toResponse(domain);
 
     }
 
     @Transactional(readOnly = true)
-    public CustomerResponse getById(Long id){
+    public CustomerResponseV1 getById(Long id){
         CustomerEntity entity = repository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
-        Customer domain = CustomerMapper.toDomain(entity);
-        return CustomerMapper.toResponse(domain);
+        Customer domain = CustomerMapperV1.toDomain(entity);
+        return CustomerMapperV1.toResponse(domain);
     }
 
     @Transactional(readOnly = true)
-    public PagedResponse<CustomerResponse> listCustomers(
+    public PagedResponseV1<CustomerResponseV1> listCustomers(
             String lastNameFilter,
             Pageable pageable
     ){
@@ -53,13 +53,13 @@ public class CustomerService {
             page = repository.findAll(pageable);
         }
         
-        List<CustomerResponse> items = page.getContent()
+        List<CustomerResponseV1> items = page.getContent()
                 .stream()
-                .map(CustomerMapper::toDomain)
-                .map(CustomerMapper::toResponse)
+                .map(CustomerMapperV1::toDomain)
+                .map(CustomerMapperV1::toResponse)
                 .toList();
         
-        return new PagedResponse<>(
+        return new PagedResponseV1<>(
                 items,
                 page.getNumber(),
                 page.getSize(),
@@ -69,4 +69,38 @@ public class CustomerService {
         );
 
     }
+
+    @Transactional
+    public CustomerResponseV1 updateCustomer(Long id, CustomerRequestV1 request){
+        CustomerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(id));
+        //full replacement of the updatable fields
+
+        entity.setFirstName(request.firstName());
+        entity.setLastName(request.lastName());
+        entity.setEmail(request.email());
+
+        Customer domain = CustomerMapperV1.toDomain(entity);
+        return CustomerMapperV1.toResponse(domain);
+    }
+
+    @Transactional
+    public CustomerResponseV1 patchCustomer(Long id, CustomerRequestV1 request){
+        CustomerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(id));
+
+        //Only override field that are non-null in patch request
+        if(request.firstName() != null && !request.firstName().isBlank()) {
+            entity.setFirstName(request.firstName());
+        }
+        if(request.lastName() != null && !request.lastName().isBlank()) {
+            entity.setLastName(request.lastName());
+        }
+        if(request.email() != null && !request.email().isBlank()) {
+            entity.setEmail(request.email());
+        }
+        Customer domain = CustomerMapperV1.toDomain(entity);
+        return CustomerMapperV1.toResponse(domain);
+    }
+
 }

@@ -1,6 +1,6 @@
 spring:                            # Root namespace for Spring configuration
   application:
-    name: customer service
+    name: customer-service
 
   datasource:
     url: jdbc:postgresql://localhost:5432/customerdb
@@ -9,19 +9,18 @@ spring:                            # Root namespace for Spring configuration
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
-      show-sql: false
-
+    show-sql: false
 server:
   port: 8081
 
 management:
   endpoints:
     web:
-      expossure:
+      exposure:
         include: health,info,metrics
   endpoint:
     health:
@@ -34,6 +33,7 @@ spring:
   config:
     activate:
       on-profile: dev
+
 logging:
   level:
     root: INFO

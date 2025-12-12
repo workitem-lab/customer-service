@@ -1,8 +1,8 @@
-package com.workitem.customer.api.dto;
+package com.workitem.customer.api.v1.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public record CustomerRequest(
+public record CustomerRequestV1(
         @NotBlank String firstName,
         @NotBlank String lastName,
         @NotBlank String email

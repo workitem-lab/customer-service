@@ -1,6 +1,6 @@
-package com.workitem.customer.api.dto;
+package com.workitem.customer.api.v1.dto;
 
-public record CustomerResponse(
+public record CustomerResponseV1(
     Long id,
     String firstName,
     String lastName,
