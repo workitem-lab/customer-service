@@ -24,34 +24,67 @@ public class CustomerService {
     }
 
     @Transactional
-    public CustomerResponseV1 create(CustomerRequestV1 request){
-        CustomerEntity entity = CustomerMapperV1.toEntity(request);
-        CustomerEntity savedEntity = repository.save(entity);
-        Customer domain = CustomerMapperV1.toDomain(savedEntity);
+    public CustomerResponseV1 createV1(CustomerRequestV1 request){
+        CustomerEntity entity = new CustomerEntity(
+                request.firstName(),
+                request.lastName(),
+                request.email()
+        );
+        CustomerEntity saved = repository.save(entity);
+        Customer domain = toDomain(saved);
         return CustomerMapperV1.toResponse(domain);
-
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
+    public CustomerResponseV1 updateCustomerV1(Long id, CustomerRequestV1 request){
+        CustomerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(id));
+        //full replacement of the updatable fields
+
+        entity.setFirstName(request.firstName());
+        entity.setLastName(request.lastName());
+        entity.setEmail(request.email());
+
+        Customer domain = toDomain(entity);
+        return CustomerMapperV1.toResponse(domain);
+    }
+
+    @Transactional
+    public CustomerResponseV1 patchCustomerV1(Long id, CustomerRequestV1 request){
+        CustomerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(id));
+
+        //Only override field that are non-null in patch request
+        if(request.firstName() != null && !request.firstName().isBlank()) {
+            entity.setFirstName(request.firstName());
+        }
+        if(request.lastName() != null && !request.lastName().isBlank()) {
+            entity.setLastName(request.lastName());
+        }
+        if(request.email() != null && !request.email().isBlank()) {
+            entity.setEmail(request.email());
+        }
+        Customer domain = toDomain(entity);
+        return CustomerMapperV1.toResponse(domain);
+    }
+
+    // ---------- READ METHODS (inherit readOnly = true) ----------
+
     public CustomerResponseV1 getById(Long id){
         CustomerEntity entity = repository.findById(id)
                 .orElseThrow(() -> new CustomerNotFoundException(id));
-        Customer domain = CustomerMapperV1.toDomain(entity);
+        Customer domain = toDomain(entity);
         return CustomerMapperV1.toResponse(domain);
     }
 
-    @Transactional(readOnly = true)
-    public PagedResponseV1<CustomerResponseV1> listCustomers(
+    public PagedResponseV1<CustomerResponseV1> listCustomersV1(
             String lastNameFilter,
             Pageable pageable
     ){
-        Page<CustomerEntity> page;
+        Page<CustomerEntity> page = (lastNameFilter != null && !lastNameFilter.isBlank())
+                ? repository.findByLastNameContainingIgnoreCase(lastNameFilter, pageable)
+                : repository.findAll(pageable);
 
-        if(lastNameFilter != null && !lastNameFilter.isBlank()) {
-            page = repository.findByLastNameContainingIgnoreCase(lastNameFilter, pageable);
-        } else  {
-            page = repository.findAll(pageable);
-        }
         
         List<CustomerResponseV1> items = page.getContent()
                 .stream()
@@ -70,37 +103,18 @@ public class CustomerService {
 
     }
 
-    @Transactional
-    public CustomerResponseV1 updateCustomer(Long id, CustomerRequestV1 request){
-        CustomerEntity entity = repository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException(id));
-        //full replacement of the updatable fields
 
-        entity.setFirstName(request.firstName());
-        entity.setLastName(request.lastName());
-        entity.setEmail(request.email());
 
-        Customer domain = CustomerMapperV1.toDomain(entity);
-        return CustomerMapperV1.toResponse(domain);
-    }
 
-    @Transactional
-    public CustomerResponseV1 patchCustomer(Long id, CustomerRequestV1 request){
-        CustomerEntity entity = repository.findById(id)
-                .orElseThrow(() -> new CustomerNotFoundException(id));
+    // ---------- Domain conversion helper ----------
 
-        //Only override field that are non-null in patch request
-        if(request.firstName() != null && !request.firstName().isBlank()) {
-            entity.setFirstName(request.firstName());
-        }
-        if(request.lastName() != null && !request.lastName().isBlank()) {
-            entity.setLastName(request.lastName());
-        }
-        if(request.email() != null && !request.email().isBlank()) {
-            entity.setEmail(request.email());
-        }
-        Customer domain = CustomerMapperV1.toDomain(entity);
-        return CustomerMapperV1.toResponse(domain);
+    private Customer toDomain(CustomerEntity entity) {
+        return new Customer(
+                entity.getId(),
+                entity.getFirstName(),
+                entity.getLastName(),
+                entity.getEmail()
+        );
     }
 
 }

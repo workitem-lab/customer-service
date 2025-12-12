@@ -1,7 +1,7 @@
 package com.workitem.customer.api.v1.mapper;
 
-import com.workitem.customer.api.v2.dto.CustomerRequestV2;
-import com.workitem.customer.api.v2.dto.CustomerResponseV2;
+import com.workitem.customer.api.v1.dto.CustomerRequestV1;
+import com.workitem.customer.api.v1.dto.CustomerResponseV1;
 import com.workitem.customer.domain.model.Customer;
 import com.workitem.customer.persistence.entity.CustomerEntity;
 
@@ -15,7 +15,7 @@ public class CustomerMapperV1 {
                 entity.getEmail()
         );
     }
-    public static CustomerEntity toEntity(CustomerRequestV2 request) {
+    public static CustomerEntity toEntity(CustomerRequestV1 request) {
         return new CustomerEntity(
                 request.firstName(),
                 request.lastName(),
@@ -23,8 +23,8 @@ public class CustomerMapperV1 {
         );
     }
 
-    public static CustomerResponseV2 toResponse(Customer domain) {
-        return new CustomerResponseV2(
+    public static CustomerResponseV1 toResponse(Customer domain) {
+        return new CustomerResponseV1(
                 domain.getId(),
                 domain.getFirstName(),
                 domain.getLastName(),
