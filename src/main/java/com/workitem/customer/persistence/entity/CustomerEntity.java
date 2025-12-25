@@ -1,12 +1,22 @@
 package com.workitem.customer.persistence.entity;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
-@Table (name = "customers")
+@Table(name = "customers")
 public class CustomerEntity {
 
     @Id
@@ -22,6 +32,9 @@ public class CustomerEntity {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
+    private List<OrderEntity> orders = new ArrayList<>();
+
     // JPA requires a no-arg constructor; protected is recommended
     protected CustomerEntity() {
     }
@@ -32,12 +45,4 @@ public class CustomerEntity {
         this.lastName = lastName;
         this.email = email;
     }
-
-    // Full-args constructor (useful for tests or mapping)
-    /*public CustomerEntity(Long id, String firstName, String lastName, String email) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-    }*/
 }

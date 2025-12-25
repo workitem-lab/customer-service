@@ -14,6 +14,7 @@ spring:                            # Root namespace for Spring configuration
       hibernate:
         format_sql: true
     show-sql: false
+    open-in-view: false
 server:
   port: 8081
 
@@ -38,5 +39,7 @@ logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 

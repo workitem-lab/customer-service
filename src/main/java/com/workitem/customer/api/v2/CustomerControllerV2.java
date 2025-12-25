@@ -1,5 +1,5 @@
 package com.workitem.customer.api.v2;
-
+/*
 import com.workitem.customer.api.v1.dto.CustomerRequestV1;
 import com.workitem.customer.api.v1.dto.CustomerResponseV1;
 import com.workitem.customer.api.v1.dto.PagedResponseV1;
@@ -56,3 +56,4 @@ public class CustomerControllerV2 {
         return service.patchCustomer(id, (CustomerRequestV1) request);
     }
 }
+*/

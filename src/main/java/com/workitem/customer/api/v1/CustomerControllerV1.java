@@ -21,8 +21,8 @@ public class CustomerControllerV1 {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerResponseV1 create(@Valid @RequestBody CustomerRequestV1 request){
-        return service.create(request);
+    public CustomerResponseV1 createV1(@Valid @RequestBody CustomerRequestV1 request){
+        return service.createV1(request);
     }
 
     @GetMapping("/{id}")
@@ -35,14 +35,14 @@ public class CustomerControllerV1 {
             @RequestParam(required = false) String lastName,
             Pageable pageable
     ){
-        return service.listCustomers(lastName, pageable);
+        return service.listCustomersV1(lastName, pageable);
     }
     @PutMapping("/{id}")
     public <CustomerUpdateRequest> CustomerResponseV1 update(
             @PathVariable Long id,
             @Valid @RequestBody CustomerUpdateRequest request
     ){
-        return service.updateCustomer(id, (CustomerRequestV1) request);
+        return service.updateCustomerV1(id, (CustomerRequestV1) request);
     }
 
     @PatchMapping("/{id}")
@@ -50,6 +50,6 @@ public class CustomerControllerV1 {
             @PathVariable Long id,
             @RequestBody CustomerPatchRequest request
     ){
-        return service.patchCustomer(id, (CustomerRequestV1) request);
+        return service.patchCustomerV1(id, (CustomerRequestV1) request);
     }
 }

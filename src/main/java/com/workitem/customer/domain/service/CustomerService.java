@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class CustomerService {
     private final CustomerRepository repository;
 
@@ -102,9 +103,6 @@ public class CustomerService {
         );
 
     }
-
-
-
 
     // ---------- Domain conversion helper ----------
 
