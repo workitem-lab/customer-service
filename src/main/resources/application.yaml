@@ -15,6 +15,7 @@ spring:                            # Root namespace for Spring configuration
         format_sql: true
     show-sql: false
     open-in-view: false
+
 server:
   port: 8081
 
@@ -22,11 +23,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       probes:
         enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: customer-service
+      tracing:
+        enabled: false
+      server:
+        part: 8081
 
 ---
 

@@ -3,6 +3,8 @@ package com.workitem.customer.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +20,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "customers")
+@Where(clause = "status <> 'DELETED'")
 public class CustomerEntity {
 
     @Id
@@ -32,6 +36,10 @@ public class CustomerEntity {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CustomerStatus status = CustomerStatus.ACTIVE;
+    
     @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY)
     private List<OrderEntity> orders = new ArrayList<>();
 
@@ -45,4 +53,6 @@ public class CustomerEntity {
         this.lastName = lastName;
         this.email = email;
     }
+
+    
 }

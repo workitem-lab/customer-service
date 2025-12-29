@@ -2,12 +2,14 @@ package com.workitem.customer.domain.service;
 
 import com.workitem.customer.api.v1.dto.CustomerRequestV1;
 import com.workitem.customer.api.v1.dto.CustomerResponseV1;
+import com.workitem.customer.api.v1.dto.CustomerSearchRequestV1;
 import com.workitem.customer.api.v1.dto.PagedResponseV1;
 import com.workitem.customer.api.v1.mapper.CustomerMapperV1;
 import com.workitem.customer.domain.model.Customer;
 import com.workitem.customer.exception.CustomerNotFoundException;
 import com.workitem.customer.persistence.entity.CustomerEntity;
 import com.workitem.customer.persistence.repo.CustomerRepository;
+import io.micrometer.core.instrument.Counter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,13 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class CustomerService {
     private final CustomerRepository repository;
+    private final CustomerSpecifications customerSpecifications;
+    private final Counter customerCreatedCounter;
 
-    public CustomerService(CustomerRepository repository) {
+    public CustomerService(CustomerRepository repository, CustomerSpecifications customerSpecifications, Counter customerCreatedCounter) {
         this.repository = repository;
+        this.customerSpecifications = customerSpecifications;
+        this.customerCreatedCounter = customerCreatedCounter;
     }
 
     @Transactional
@@ -32,6 +38,7 @@ public class CustomerService {
                 request.email()
         );
         CustomerEntity saved = repository.save(entity);
+        customerCreatedCounter.increment();
         Customer domain = toDomain(saved);
         return CustomerMapperV1.toResponse(domain);
     }
@@ -102,6 +109,35 @@ public class CustomerService {
                 page.isLast()
         );
 
+    }
+
+    @Transactional(readOnly = true)
+    public PagedResponseV1<CustomerResponseV1> searchCustomers(
+            CustomerSearchRequestV1 searchRequest,
+            Pageable pageable
+    ){
+        var spec = customerSpecifications.fromSearchRequest(searchRequest);
+
+        Page<CustomerEntity> page = repository.findAll(spec, pageable);
+
+        List<CustomerResponseV1> items = page.getContent().stream()
+                .map(this::toDomain)
+                .map(CustomerMapperV1::toResponse)
+                .toList();
+        return new PagedResponseV1<>(
+                items,
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages(),
+                page.isLast()
+        );
+    }
+
+    @Transactional
+    public void deleteCustomerV1(Long id){
+        CustomerEntity entity = repository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException(id));
     }
 
     // ---------- Domain conversion helper ----------

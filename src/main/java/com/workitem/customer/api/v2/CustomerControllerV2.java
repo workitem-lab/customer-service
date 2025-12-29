@@ -1,8 +1,5 @@
 package com.workitem.customer.api.v2;
-/*
-import com.workitem.customer.api.v1.dto.CustomerRequestV1;
-import com.workitem.customer.api.v1.dto.CustomerResponseV1;
-import com.workitem.customer.api.v1.dto.PagedResponseV1;
+
 import com.workitem.customer.api.v2.dto.CustomerRequestV2;
 import com.workitem.customer.api.v2.dto.CustomerResponseV2;
 import com.workitem.customer.api.v2.dto.PagedResponseV2;
@@ -24,36 +21,35 @@ public class CustomerControllerV2 {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CustomerResponseV1 create(@Valid @RequestBody CustomerRequestV1 request){
+    public CustomerResponseV2 create(@Valid @RequestBody CustomerRequestV2 request){
         return service.create(request);
     }
 
     @GetMapping("/{id}")
-    public CustomerResponseV1 get(@PathVariable Long id){
+    public CustomerResponseV2 get(@PathVariable Long id){
         return service.getById(id);
     }
 
     @GetMapping
-    public PagedResponseV1<CustomerResponseV1> listCustomers(
+    public PagedResponseV2<CustomerResponseV2> listCustomers(
             @RequestParam(required = false) String lastName,
             Pageable pageable
     ){
         return service.listCustomers(lastName, pageable);
     }
     @PutMapping("/{id}")
-    public <CustomerUpdateRequest> CustomerResponseV1 update(
+    public <CustomerUpdateRequest> CustomerResponseV2 update(
             @PathVariable Long id,
             @Valid @RequestBody CustomerUpdateRequest request
     ){
-        return service.updateCustomer(id, (CustomerRequestV1) request);
+        return service.updateCustomer(id, (CustomerRequestV2) request);
     }
 
     @PatchMapping("/{id}")
-    public <CustomerPatchRequest> CustomerResponseV1 patch(
+    public <CustomerPatchRequest> CustomerResponseV2 patch(
             @PathVariable Long id,
             @RequestBody CustomerPatchRequest request
     ){
-        return service.patchCustomer(id, (CustomerRequestV1) request);
+        return service.patchCustomer(id, (CustomerRequestV2) request);
     }
 }
-*/
