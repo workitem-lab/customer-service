@@ -5,7 +5,6 @@ import com.workitem.customer.api.v1.dto.OrderSummaryResponseV1;
 import com.workitem.customer.persistence.entity.CustomerEntity;
 import com.workitem.customer.persistence.entity.OrderEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerWithOrdersMapperV1 {

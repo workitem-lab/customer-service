@@ -1,5 +1,7 @@
 package com.workitem.customer.domain.service;
 
+import brave.Span;
+import brave.Tracer;
 import com.workitem.customer.api.v1.dto.CustomerRequestV1;
 import com.workitem.customer.api.v1.dto.CustomerResponseV1;
 import com.workitem.customer.api.v1.dto.CustomerSearchRequestV1;
@@ -23,24 +25,36 @@ public class CustomerService {
     private final CustomerRepository repository;
     private final CustomerSpecifications customerSpecifications;
     private final Counter customerCreatedCounter;
+    private final Tracer tracer;
 
-    public CustomerService(CustomerRepository repository, CustomerSpecifications customerSpecifications, Counter customerCreatedCounter) {
+    public CustomerService(CustomerRepository repository, CustomerSpecifications customerSpecifications, Counter customerCreatedCounter, Tracer tracer) {
         this.repository = repository;
         this.customerSpecifications = customerSpecifications;
         this.customerCreatedCounter = customerCreatedCounter;
+        this.tracer = tracer;
     }
 
     @Transactional
     public CustomerResponseV1 createV1(CustomerRequestV1 request){
-        CustomerEntity entity = new CustomerEntity(
-                request.firstName(),
-                request.lastName(),
-                request.email()
-        );
-        CustomerEntity saved = repository.save(entity);
-        customerCreatedCounter.increment();
-        Customer domain = toDomain(saved);
-        return CustomerMapperV1.toResponse(domain);
+        Span newCustomerSpan = tracer.nextSpan().name("create-customer").start();
+
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(newCustomerSpan)) {
+
+
+            CustomerEntity entity = new CustomerEntity(
+                    request.firstName(),
+                    request.lastName(),
+                    request.email()
+            );
+            CustomerEntity saved = repository.save(entity);
+            //customerCreatedCounter.increment();
+            Customer domain = toDomain(saved);
+
+            return CustomerMapperV1.toResponse(domain);
+
+        } finally {
+            newCustomerSpan.finish();
+        }
     }
 
     @Transactional
